@@ -3,9 +3,9 @@ $fn = 50;
 
 difference() {
 	union() {
-		cylinder(h = 15, r = 7.0000000000);
+		cylinder(h = 15, r = 5.0000000000);
 		translate(v = [30, 0, 0.0000000000]) {
-			cylinder(h = 15, r = 7.0000000000);
+			cylinder(h = 15, r = 5.0000000000);
 		}
 	}
 	union() {
