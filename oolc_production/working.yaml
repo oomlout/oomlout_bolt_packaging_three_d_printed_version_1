@@ -1,6 +1,0 @@
-project_id: oomlout_bolt_packaging_three_d_printed_version_1
-project_name: Oomlout Bolt Packaging Three D Printed Version 1
-project_repo: https://github.com/oomlout/oomlout_bolt_packaging_three_d_printed_version_1
-production_format:
-  oolc_1:
-    file_location: source_files/oolc_1.cdr
