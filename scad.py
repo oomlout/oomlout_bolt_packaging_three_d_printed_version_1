@@ -349,7 +349,7 @@ def get_hinge_bottom(thing, **kwargs):
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
 
-    #add connecting cube
+    #add connecting cube top
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
@@ -361,6 +361,22 @@ def get_hinge_bottom(thing, **kwargs):
     pos1 = copy.deepcopy(pos_plate)
     pos1[1] += -7.5 /2   
     pos1[2] += (15 - diameter_hinge_bottom)  /2    
+    p3["pos"] = pos1
+    #p3["m"] = "#"
+    oobb_base.append_full(thing,**p3)
+
+    #add connecting cube bottom
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "p"
+    p3["shape"] = f"oobb_cube"
+    w = width * 15 + 1
+    h = height * 15 - (15 - diameter_hinge_bottom)
+    d = depth/2
+    size = [w, h, d]
+    p3["size"] = size
+    pos1 = copy.deepcopy(pos_plate)
+    pos1[1] += 0
+    pos1[2] += 0
     p3["pos"] = pos1
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
@@ -716,23 +732,44 @@ def get_lid_array(thing, **kwargs):
 
     
     
-    clearance_inset = 1
+    clearance_inset = 0.5
+    thickness_wall_inset = 0.5
     for pocket in pocket_array:
         shape_pocket = pocket.get("shape", default_shape_pocket)
         clearance_wall = pocket.get("clearance_wall", default_clearance_wall)
         clearance_bottom = pocket.get("clearance_bottom", default_clearance_bottom)
         width_tray = pocket.get("width", 8)
         height_tray = pocket.get("height", 8)
+        #main outline
         p3 = copy.deepcopy(kwargs)
         p3["type"] = "p"
+        p3["radius"] = 5 - clearance_wall * 2 - clearance_inset * 2
         p3["shape"] = shape_pocket
         p3["depth"] = depth * 2
-        w = (width_tray * 15) - clearance_wall - clearance_inset
-        h = (height_tray * 15) - clearance_wall - clearance_inset
+        w = (width_tray * 15) - clearance_wall - clearance_inset * 2
+        h = (height_tray * 15) - clearance_wall - clearance_inset * 2
         d = depth * 2
         p3["size"] = [w, h, d]
         pos1 = copy.deepcopy(pocket["position"])
         pos1[2] += -depth
+        p3["pos"] = pos1
+        if "sphere" in shape_pocket:
+            pass
+            #p3["radius"] = depth
+        #p3["m"] = "#"
+        oobb_base.append_full(thing,**p3)
+        #cutout
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = shape_pocket
+        p3["radius"] = 5 - clearance_inset * 2 - thickness_wall_inset * 2
+        p3["depth"] = depth * 2
+        w = (width_tray * 15) - clearance_wall - clearance_inset - thickness_wall_inset * 2
+        h = (height_tray * 15) - clearance_wall - clearance_inset - thickness_wall_inset * 2
+        d = depth * 2
+        p3["size"] = [w, h, d]
+        pos1 = copy.deepcopy(pocket["position"])
+        pos1[2] += -depth - depth
         p3["pos"] = pos1
         if "sphere" in shape_pocket:
             pass
@@ -811,7 +848,7 @@ def get_main_body(thing, **kwargs):
     poss = []
     pos1 = copy.deepcopy(pos)
     pos1[1] += 7.5
-    pos1[2] += depth - 15/2 + 1/2
+    pos1[2] += depth - 15/2
     pos11 = copy.deepcopy(pos1)
     pos11[0] += shift_hinge
     pos12 = copy.deepcopy(pos1)
