@@ -120,9 +120,10 @@ def make_scad(**kwargs):
 def get_hinge(thing, **kwargs):  
 
     #adding variables
-    clearance_design = 1
+    clearance_design = kwargs.get("clearance_design", 0.5)
     kwargs["clearance_wall"] = clearance_design
-
+    width_hinge = 5
+    kwargs["width_hinge"] = width_hinge
 
 
     pos = kwargs.get("pos", [0, 0, 0])
@@ -151,24 +152,74 @@ def get_hinge_bottom(thing, **kwargs):
     prepare_print = kwargs.get("prepare_print", False)
 
     # variable
-    clearance_design = kwargs.get("clearance_design", 1)
+    clearance_design = kwargs.get("clearance_design", 0.5)
     
     #add plate main
+    # p3 = copy.deepcopy(kwargs)
+    # p3["type"] = "p"
+    # p3["shape"] = f"oobb_plate"  
+    # p3["depth"] = depth/2
+    # pos1 = copy.deepcopy(pos_plate)
+    # pos1[2] += depth/4
+    # p3["pos"] = pos1
+    # p3["extra_mm"] = True
+    # #p3["m"] = "#"
+    # pos1 = copy.deepcopy(pos_plate)         
+    # p3["pos"] = pos1
+    # oobb_base.append_full(thing,**p3)
+
+    #add main cylinder
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
-    p3["shape"] = f"oobb_plate"  
-    p3["depth"] = depth
-    p3["extra_mm"] = True
+    p3["shape"] = f"oobb_cylinder"  
+    p3["radius"] = 14 / 2
+    d = 15
+    p3["depth"] = d
+    p3["rot"] = [0, 90, 0]
+    p3["zz"] = "bottom"
     #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos_plate)         
+    pos1 = copy.deepcopy(pos)         
+    pos1[0] += -d/2
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
+
+    #add connecting cube top
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "p"
+    p3["shape"] = f"oobb_cube"
+    w = width * 15
+    h = height*15 - 7.5
+    d = (depth-1)
+    size = [w, h, d]
+    p3["size"] = size
+    pos1 = copy.deepcopy(pos_plate)
+    pos1[1] += -7.5 /2   
+    pos1[2] += 0.5      
+    p3["pos"] = pos1
+    #p3["m"] = "#"
+    oobb_base.append_full(thing,**p3)
+
+    # #add connecting cube bottom
+    # p3 = copy.deepcopy(kwargs)
+    # p3["type"] = "p"
+    # p3["shape"] = f"oobb_cube"
+    # w = width * 15
+    # h = height*15 - 7.5
+    # d = (depth-1)/2
+    # size = [w, h, d]
+    # p3["size"] = size
+    # pos1 = copy.deepcopy(pos_plate)
+    # pos1[1] += -7.5 /2
+    # p3["pos"] = pos1
+    # p3["m"] = "#"
+    # oobb_base.append_full(thing,**p3)
       
     #add cutout central
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "n"
     p3["shape"] = f"oobb_cube"
-    w = 3 + clearance_design
+    width_hinge = kwargs.get("width_hinge", 5)    
+    w = width_hinge + clearance_design
     h = 15
     d = 15
     p3["zz"] = "middle"
@@ -188,7 +239,7 @@ def get_hinge_bottom(thing, **kwargs):
     pos1 =  copy.deepcopy(pos)
     pos1[0] += -d/2
     p3["pos"] = pos1
-    p3["m"] = "#"
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
     
     
@@ -204,16 +255,17 @@ def get_hinge_top(thing, **kwargs):
     pos_plate[1] += -height * 15 / 4
     pos_plate[2] += -depth /2
     prepare_print = kwargs.get("prepare_print", False)
+    width_hinge = kwargs.get("width_hinge", 5)
 
     # variable
-    clearance_design = kwargs.get("clearance_design", 1)
+    clearance_design = kwargs.get("clearance_design", 0.5)
     
     #add main cylinder
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cylinder"  
     p3["radius"] = 14 / 2
-    d = 3
+    d = width_hinge
     p3["depth"] = d
     p3["rot"] = [0, 90, 0]
     p3["zz"] = "bottom"
@@ -227,7 +279,7 @@ def get_hinge_top(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
-    w = 3
+    w = width_hinge
     h = 14
     d = depth/2
     size = [w, h, d]
@@ -268,8 +320,60 @@ def get_hinge_top(thing, **kwargs):
     oobb_base.append_full(thing,**p3)
     
 
-
 def get_main_body(thing, **kwargs):
+    depth = kwargs.get("thickness", 4)
+    height = kwargs.get("height", 10)
+    width = kwargs.get("width", 10)
+
+    #main body variables
+    width_tray = kwargs.get("width_tray", 8)
+    height_tray = kwargs.get("height_tray", 8)
+    width_tray_tray = width * width_tray
+    kwargs["width_tray_tray"] = width_tray_tray
+    width_tray_tray_mm = width_tray_tray * 15
+    kwargs["width_tray_tray_mm"] = width_tray_tray_mm
+    height_tray_tray = height * height_tray
+    kwargs["height_tray_tray"] = height_tray_tray
+    height_tray_tray_mm = height_tray_tray * 15
+    kwargs["height_tray_tray_mm"] = height_tray_tray_mm  
+    default_clearance_wall = kwargs.get("clearance_wall", 1/2)
+    kwargs["clearance_wall"] = default_clearance_wall 
+
+    # main body
+    p3 = copy.deepcopy(kwargs)    
+    pos = p3.get("pos", [0, 0, 0])
+    pos1 = copy.deepcopy(pos)
+    pos1[1] += -height_tray_tray_mm / 2
+    p3["pos"] = pos1
+    get_main_body_basic(thing, **p3)
+    
+
+    #hinge variables
+    #adding variables
+
+    #hinge
+    shift = width_tray_tray_mm / 2 - 15/2 + default_clearance_wall/2
+
+    p3 = copy.deepcopy(kwargs)    
+    p3["thickness"] = 15
+    p3["width"] = 1
+    p3["height"] = 2
+    poss = []
+    pos1 = copy.deepcopy(pos)
+    pos1[1] += 7.5
+    pos1[2] += depth - 15/2
+    pos11 = copy.deepcopy(pos1)
+    pos11[0] += shift
+    pos12 = copy.deepcopy(pos1)
+    pos12[0] += -shift
+    poss.append(pos11)
+    poss.append(pos12)
+    for pos in poss:
+        p4 = copy.deepcopy(p3)
+        p4["pos"] = pos
+        get_hinge_bottom(thing, **p4)
+
+def get_main_body_basic(thing, **kwargs):
     depth = kwargs.get("thickness", 4)
     width = kwargs.get("width", 10)
     height = kwargs.get("height", 10)
@@ -310,8 +414,10 @@ def get_main_body(thing, **kwargs):
 def get_main_body_array(thing, **kwargs):
     #default_shape_pocket = "oobb_cube"
     default_shape_pocket = "sphere_rectangle"
-    default_clearance_wall = 1 / 2
+    default_clearance_wall = kwargs.get("clearance_wall", 1/2)
     default_clearance_bottom = default_clearance_wall
+    kwargs["clearance_wall"] = default_clearance_wall
+    kwargs["clearance_bottom"] = default_clearance_bottom
 
 
     depth = kwargs.get("thickness", 4)
@@ -352,57 +458,60 @@ def get_main_body_array(thing, **kwargs):
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
     
-    #add plate hinge_support
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "p"
-    p3["shape"] = f"oobb_plate"    
-    p3["depth"] = depth_hinge_support
-    p3["width"] = 1 + extra_size
-    p3["height"] = height_tray_tray + 1 + extra_size
-    p3["extra_mm"] = True
-    poss = []
-    pos1 = copy.deepcopy(pos)    
-    pos1[1] += 15/2
-    pos11 = copy.deepcopy(pos1)
-    pos11[0] += width_tray_tray * 15 / 2 - 15/2
-    pos12 = copy.deepcopy(pos1)
-    pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
-    poss.append(pos11)
-    poss.append(pos12)
-    p3["pos"] = poss
-    oobb_base.append_full(thing,**p3)
+    #add plate hinge_support 
+    #no longer used
+    # p3 = copy.deepcopy(kwargs)
+    # p3["type"] = "p"
+    # p3["shape"] = f"oobb_plate"    
+    # p3["depth"] = depth_hinge_support
+    # p3["width"] = 1 + extra_size
+    # p3["height"] = height_tray_tray + 1 + extra_size
+    # p3["extra_mm"] = True
+    # poss = []
+    # pos1 = copy.deepcopy(pos)    
+    # pos1[1] += 15/2
+    # pos11 = copy.deepcopy(pos1)
+    # pos11[0] += width_tray_tray * 15 / 2 - 15/2
+    # pos12 = copy.deepcopy(pos1)
+    # pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
+    # poss.append(pos11)
+    # poss.append(pos12)
+    # p3["pos"] = poss
+    # oobb_base.append_full(thing,**p3)
     
 
 
     #add holes
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "n"
-    p3["shape"] = f"oobb_hole"
-    p3["radius_name"] = "m6"         
-    p3["width"] = width_tray_tray
-    p3["height"] = height_tray_tray    
-    poss = []
-    pos1 = copy.deepcopy(pos)
-    pos1[1] += height_tray_tray* 15/2 + 15/2
-    pos11 = copy.deepcopy(pos1)
-    pos11[0] += width_tray_tray * 15 / 2 - 15/2
-    pos12 = copy.deepcopy(pos1)
-    pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
-    poss.append(pos11)
-    poss.append(pos12)
-    p3["pos"] = poss
-    #p3["m"] = "#"
-    oobb_base.append_full(thing,**p3)
+    #no lnoger used
+    # p3 = copy.deepcopy(kwargs)
+    # p3["type"] = "n"
+    # p3["shape"] = f"oobb_hole"
+    # p3["radius_name"] = "m6"         
+    # p3["width"] = width_tray_tray
+    # p3["height"] = height_tray_tray    
+    # poss = []
+    # pos1 = copy.deepcopy(pos)
+    # pos1[1] += height_tray_tray* 15/2 + 15/2
+    # pos11 = copy.deepcopy(pos1)
+    # pos11[0] += width_tray_tray * 15 / 2 - 15/2
+    # pos12 = copy.deepcopy(pos1)
+    # pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
+    # poss.append(pos11)
+    # poss.append(pos12)
+    # p3["pos"] = poss
+    # #p3["m"] = "#"
+    # oobb_base.append_full(thing,**p3)
     
     #add m6 nuts
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "n"
-    p3["shape"] = f"oobb_nut"
-    p3["radius_name"] = "m6"
-    p3["pos"] = poss
-    p3["overhang"] = True
-    #p3["m"] = "#"
-    oobb_base.append_full(thing,**p3)
+    #no longer used
+    # p3 = copy.deepcopy(kwargs)
+    # p3["type"] = "n"
+    # p3["shape"] = f"oobb_nut"
+    # p3["radius_name"] = "m6"
+    # p3["pos"] = poss
+    # p3["overhang"] = True
+    # #p3["m"] = "#"
+    # oobb_base.append_full(thing,**p3)
     
 
     
@@ -425,7 +534,7 @@ def get_main_body_array(thing, **kwargs):
         pos1 = copy.deepcopy(pocket["position"])
         pos1[2] += clearance_bottom
         p3["pos"] = pos1
-        p3["m"] = "#"
+        #p3["m"] = "#"
         oobb_base.append_full(thing,**p3)
 
 
