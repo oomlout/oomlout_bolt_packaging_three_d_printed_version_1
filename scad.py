@@ -618,7 +618,7 @@ def get_main_body(thing, **kwargs):
     poss = []
     pos1 = copy.deepcopy(pos)
     pos1[1] += 7.5
-    pos1[2] += depth - 15/2
+    pos1[2] += depth - 15/2 + 1/2
     pos11 = copy.deepcopy(pos1)
     pos11[0] += shift
     pos12 = copy.deepcopy(pos1)
