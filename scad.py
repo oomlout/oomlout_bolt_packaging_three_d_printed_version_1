@@ -38,6 +38,7 @@ def make_scad(**kwargs):
         pass
     
     # declare parts
+    run_fast = True
     if True:
 
         part_default = {} 
@@ -47,22 +48,28 @@ def make_scad(**kwargs):
         
 
         sizes = []
-        for i in range(1, 6):
+        for i in range(1, 4):
             pass
-            #sizes.append({"width": i, "height": i})        
+            if not run_fast:
+                sizes.append({"width": i, "height": i})        
         sizes.append({"width": 2, "height": 1}) 
 
 
         trays = []
         trays.append({"width": 2, "height": 2})
+        if not run_fast:
+            trays.append({"width": 3, "height": 2})
+            trays.append({"width": 3, "height": 3})
         thicknesses = [15]
+        if not run_fast:
+            thicknesses.append(20)
         
 
         sizes_complete = []
         for size in sizes:
             for tray in trays:
                 for thickness in thicknesses:
-                    sizes_complete.append({"width": size["width"], "height": size["height"], "width_tray": tray["width"], "height_tray" : tray["width"], "thickness": thickness})
+                    sizes_complete.append({"width": size["width"], "height": size["height"], "width_tray": tray["width"], "height_tray" : tray["height"], "thickness": thickness})
 
 
         for size in sizes_complete:
@@ -88,6 +95,20 @@ def make_scad(**kwargs):
             p3["height_full"] = height_full
             height_full_mm = height_full * 15
             p3["height_full_mm"] = height_full_mm
+                    
+            #main body variables
+            width_tray_tray = w * width_tray
+            p3["width_tray_tray"] = width_tray_tray
+            width_tray_tray_mm = width_tray_tray * 15
+            p3["width_tray_tray_mm"] = width_tray_tray_mm
+            height_tray_tray = h * height_tray
+            p3["height_tray_tray"] = height_tray_tray
+            height_tray_tray_mm = height_tray_tray * 15
+            p3["height_tray_tray_mm"] = height_tray_tray_mm  
+            default_clearance_wall = 1/2
+            p3["clearance_wall"] = default_clearance_wall 
+            default_shift_hinge = width_tray_tray_mm / 2 - 15/2 + default_clearance_wall/2 - 1/2 
+            p3["shift_hinge"] = default_shift_hinge
 
             p3["extra"] = extra 
             p3["thickness"] = size["thickness"]
@@ -174,11 +195,25 @@ def get_latch_bottom(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 10 / 2
+    p3["radius"] = 6 / 2
     p3["depth"] = depth
     p3["zz"] = "bottom"
     #p3["m"] = "#"
     pos1 = copy.deepcopy(pos)         
+    p3["pos"] = pos1
+    oobb_base.append_full(thing,**p3)
+
+    #add bottom cylinder
+    
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "p"
+    p3["shape"] = f"oobb_cylinder"  
+    p3["radius"] = 10 / 2
+    p3["depth"] = 5
+    p3["zz"] = "bottom"
+    #p3["m"] = "#"
+    pos1 = copy.deepcopy(pos)         
+
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
 
@@ -282,6 +317,7 @@ def get_hinge_bottom(thing, **kwargs):
 
     # variable
     clearance_design = kwargs.get("clearance_design", 0.5)
+    screw_rotation = kwargs.get("screw_rotation", False)
     
     #add plate main
     # p3 = copy.deepcopy(kwargs)
@@ -300,8 +336,9 @@ def get_hinge_bottom(thing, **kwargs):
     #add main cylinder
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
-    p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 14 / 2
+    p3["shape"] = f"oobb_cylinder"
+    diameter_hinge_bottom = 12
+    p3["radius"] = diameter_hinge_bottom / 2
     d = width * 15 + 1
     p3["depth"] = d
     p3["rot"] = [0, 90, 0]
@@ -312,18 +349,18 @@ def get_hinge_bottom(thing, **kwargs):
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
 
-    #add connecting cube top
+    #add connecting cube
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
     w = width * 15 + 1
     h = height*15 - 7.5
-    d = (depth-1)
+    d = diameter_hinge_bottom
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
     pos1[1] += -7.5 /2   
-    pos1[2] += 0.5      
+    pos1[2] += (15 - diameter_hinge_bottom)  /2    
     p3["pos"] = pos1
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
@@ -349,7 +386,8 @@ def get_hinge_bottom(thing, **kwargs):
     p3["shape"] = f"oobb_cube"
     width_hinge = kwargs.get("width_hinge", 5)    
     w = width_hinge + clearance_design
-    h = 15
+    clearance_wall = kwargs.get("clearance_wall", 1/2)
+    h = 15 - clearance_wall
     d = 15
     p3["zz"] = "middle"
     size = [w, h, d]
@@ -378,10 +416,14 @@ def get_hinge_bottom(thing, **kwargs):
     p3["radius_name"] = "m3"
     pos2 = copy.deepcopy(pos1)
     pos2[0] += width * 15 + 1/2
+    if screw_rotation:
+        pos2[0] += -16
     p3["pos"] = pos2    
     p3["nut"] = True
     p3["depth"] = width*15 + 1
     p3["rot"] = [0, 90, 0]
+    if screw_rotation:
+        p3["rot"] = [0, 270, 0]
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
@@ -408,7 +450,8 @@ def get_hinge_top(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 14 / 2
+    radius_hinge_top = 14 / 2
+    p3["radius"] = radius_hinge_top
     d = width_hinge
     p3["depth"] = d
     p3["rot"] = [0, 90, 0]
@@ -425,13 +468,13 @@ def get_hinge_top(thing, **kwargs):
     p3["shape"] = f"oobb_cube"
     w = width_hinge
     r = 14
-    h = r / 2
+    h = r
     d = depth/2
     size = [w, h, d]
     p3["size"] = size    
     pos1 = copy.deepcopy(pos)
     p3["pos"] = pos1
-    pos1[1] += -r/4
+    pos1[1] += 0
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
       
@@ -439,13 +482,13 @@ def get_hinge_top(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
-    w = 15
-    h = height*15 - 7.5
+    w = width * 15 + 1
+    h = height*15
     d = depth_lid
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos)
-    pos1[1] += -h/2
+    pos1[1] += -h/4
     pos1[2] += depth/2
     p3["pos"] = pos1
     #p3["m"] = "#"
@@ -470,19 +513,18 @@ def get_lid(thing, **kwargs):
     height = kwargs.get("height", 10)
     width = kwargs.get("width", 10)
 
-    #main body variables
-    width_tray = kwargs.get("width_tray", 8)
-    height_tray = kwargs.get("height_tray", 8)
-    width_tray_tray = width * width_tray
-    kwargs["width_tray_tray"] = width_tray_tray
-    width_tray_tray_mm = width_tray_tray * 15
-    kwargs["width_tray_tray_mm"] = width_tray_tray_mm
-    height_tray_tray = height * height_tray
-    kwargs["height_tray_tray"] = height_tray_tray
-    height_tray_tray_mm = height_tray_tray * 15
-    kwargs["height_tray_tray_mm"] = height_tray_tray_mm  
-    default_clearance_wall = kwargs.get("clearance_wall", 1/2)
-    kwargs["clearance_wall"] = default_clearance_wall 
+    #main body variables    
+    height_tray = kwargs.get("height_tray")
+    height_tray_tray = kwargs.get("height_tray_tray")
+    height_tray_tray_mm = kwargs.get("height_tray_tray_mm")
+    width_tray = kwargs.get("width_tray")
+    width_tray_tray = kwargs.get("width_tray_tray")
+    width_tray_tray_mm = kwargs.get("width_tray_tray_mm")    
+    clearance_wall = kwargs.get("clearance_wall")
+    clearance_bottom = kwargs.get("clearance_bottom")
+    shift_hinge = kwargs.get("shift_hinge")
+    
+
 
     # main body
     p3 = copy.deepcopy(kwargs)    
@@ -499,7 +541,7 @@ def get_lid(thing, **kwargs):
     kwargs["depth_lid"] = depth_lid
 
     #hinge
-    shift = width_tray_tray_mm / 2 - 15/2 + default_clearance_wall/2
+    shift_hinge = kwargs.get("shift_hinge", None)
 
     p3 = copy.deepcopy(kwargs)    
     p3["thickness"] = 15
@@ -510,9 +552,9 @@ def get_lid(thing, **kwargs):
     pos1[1] += 7.5
     pos1[2] += -15/2
     pos11 = copy.deepcopy(pos1)
-    pos11[0] += shift
+    pos11[0] += shift_hinge
     pos12 = copy.deepcopy(pos1)
-    pos12[0] += -shift
+    pos12[0] += -shift_hinge
     poss.append(pos11)
     poss.append(pos12)
     for pos1 in poss:
@@ -734,19 +776,17 @@ def get_main_body(thing, **kwargs):
     height = kwargs.get("height", 10)
     width = kwargs.get("width", 10)
 
-    #main body variables
-    width_tray = kwargs.get("width_tray", 8)
-    height_tray = kwargs.get("height_tray", 8)
-    width_tray_tray = width * width_tray
-    kwargs["width_tray_tray"] = width_tray_tray
-    width_tray_tray_mm = width_tray_tray * 15
-    kwargs["width_tray_tray_mm"] = width_tray_tray_mm
-    height_tray_tray = height * height_tray
-    kwargs["height_tray_tray"] = height_tray_tray
-    height_tray_tray_mm = height_tray_tray * 15
-    kwargs["height_tray_tray_mm"] = height_tray_tray_mm  
-    default_clearance_wall = kwargs.get("clearance_wall", 1/2)
-    kwargs["clearance_wall"] = default_clearance_wall 
+    #main body variables    
+    height_tray = kwargs.get("height_tray")
+    height_tray_tray = kwargs.get("height_tray_tray")
+    height_tray_tray_mm = kwargs.get("height_tray_tray_mm")
+    width_tray = kwargs.get("width_tray")
+    width_tray_tray = kwargs.get("width_tray_tray")
+    width_tray_tray_mm = kwargs.get("width_tray_tray_mm")    
+    clearance_wall = kwargs.get("clearance_wall")
+    clearance_bottom = kwargs.get("clearance_bottom")
+    shift_hinge = kwargs.get("shift_hinge")
+    
 
     # main body
     p3 = copy.deepcopy(kwargs)    
@@ -761,7 +801,8 @@ def get_main_body(thing, **kwargs):
     #adding variables
 
     #hinge
-    shift = width_tray_tray_mm / 2 - 15/2 + default_clearance_wall/2 - 1/2 #extra half because hinge is now 16 mm
+    
+    shift_hinge = kwargs.get("shift_hinge", None)
 
     p3 = copy.deepcopy(kwargs)    
     p3["thickness"] = 15
@@ -772,25 +813,42 @@ def get_main_body(thing, **kwargs):
     pos1[1] += 7.5
     pos1[2] += depth - 15/2 + 1/2
     pos11 = copy.deepcopy(pos1)
-    pos11[0] += shift
+    pos11[0] += shift_hinge
     pos12 = copy.deepcopy(pos1)
-    pos12[0] += -shift
+    pos12[0] += -shift_hinge
     poss.append(pos11)
     poss.append(pos12)
+    screw_rotation = False
     for pos1 in poss:
         p4 = copy.deepcopy(p3)
+        p4["screw_rotation"] = screw_rotation
         p4["pos"] = pos1
         get_hinge_bottom(thing, **p4)
+        screw_rotation = not screw_rotation
 
     #add latch
     p3 = copy.deepcopy(kwargs)
     p3["thickness"] =  depth
     p3["width"] = 1
     p3["height"] = 1
-    pos1 = copy.deepcopy(pos)
-    pos1[1] += -height_tray_tray_mm
-    p3["pos"] = pos1
-    get_latch_bottom(thing, **p3)
+    poss = []
+    if width % 2 != 0:
+        pos1 = copy.deepcopy(pos)
+        pos1[1] += -height_tray_tray_mm
+        pos11 = copy.deepcopy(pos1)
+        pos11[0] += width_tray * 15 / 2
+        pos12 = copy.deepcopy(pos1)
+        pos12[0] += -width_tray * 15 / 2
+        poss.append(pos11)
+        poss.append(pos12)
+    else:
+        pos1 = copy.deepcopy(pos)
+        pos1[1] += -height_tray_tray_mm
+        poss.append(pos1)
+    for pos1 in poss:
+        p4 = copy.deepcopy(p3)
+        p4["pos"] = pos1
+        get_latch_bottom(thing, **p4)
 
 def get_main_body_basic(thing, **kwargs):
     depth = kwargs.get("thickness", 4)
