@@ -3,11 +3,16 @@ import opsc
 import oobb
 import oobb_base
 
+clearance_design = 1
+
 def main(**kwargs):
     make_scad(**kwargs)
 
 def make_scad(**kwargs):
     parts = []
+
+    run_fast = True
+    #run_fast = False
 
     # save_type variables
     if True:
@@ -38,7 +43,7 @@ def make_scad(**kwargs):
         pass
     
     # declare parts
-    run_fast = True
+    
     if True:
 
         part_default = {} 
@@ -154,7 +159,8 @@ def make_scad(**kwargs):
 def get_latch(thing, **kwargs):  
 
     #adding variables
-    clearance_design = kwargs.get("clearance_design", 0.5)
+    global clearance_design
+    kwargs["clearance_design"] = clearance_design
     kwargs["clearance_wall"] = clearance_design
     width_hinge = 5
     kwargs["width_hinge"] = width_hinge
@@ -187,10 +193,6 @@ def get_latch_bottom(thing, **kwargs):
     prepare_print = kwargs.get("prepare_print", False)
     
 
-    # variable
-    clearance_design = kwargs.get("clearance_design", 0.5)
-    
-
     #add main cylinder
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
@@ -208,7 +210,7 @@ def get_latch_bottom(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 10 / 2
+    p3["radius"] = 8 / 2
     p3["depth"] = 5
     p3["zz"] = "bottom"
     #p3["m"] = "#"
@@ -284,7 +286,7 @@ def get_latch_top(thing, **kwargs):
 def get_hinge(thing, **kwargs):  
 
     #adding variables
-    clearance_design = kwargs.get("clearance_design", 0.5)
+    global clearance_design 
     kwargs["clearance_wall"] = clearance_design
     width_hinge = 5
     kwargs["width_hinge"] = width_hinge
@@ -316,7 +318,7 @@ def get_hinge_bottom(thing, **kwargs):
     prepare_print = kwargs.get("prepare_print", False)
 
     # variable
-    clearance_design = kwargs.get("clearance_design", 0.5)
+    global clearance_design
     screw_rotation = kwargs.get("screw_rotation", False)
     
     #add plate main
@@ -732,9 +734,10 @@ def get_lid_array(thing, **kwargs):
 
     
     
-    clearance_inset = 0.5
+    clearance_inset = 1.4
     thickness_wall_inset = 0.5
     for pocket in pocket_array:
+        depth_pocket = 1.5
         shape_pocket = pocket.get("shape", default_shape_pocket)
         clearance_wall = pocket.get("clearance_wall", default_clearance_wall)
         clearance_bottom = pocket.get("clearance_bottom", default_clearance_bottom)
@@ -743,15 +746,16 @@ def get_lid_array(thing, **kwargs):
         #main outline
         p3 = copy.deepcopy(kwargs)
         p3["type"] = "p"
-        p3["radius"] = 5 - clearance_wall * 2 - clearance_inset * 2
+        r = 5 - (clearance_wall + clearance_inset * 2)/2
+        p3["radius"] = r
         p3["shape"] = shape_pocket
-        p3["depth"] = depth * 2
+        p3["depth"] = depth_pocket
         w = (width_tray * 15) - clearance_wall - clearance_inset * 2
         h = (height_tray * 15) - clearance_wall - clearance_inset * 2
-        d = depth * 2
+        d = depth_pocket
         p3["size"] = [w, h, d]
         pos1 = copy.deepcopy(pocket["position"])
-        pos1[2] += -depth
+        pos1[2] += -depth_pocket
         p3["pos"] = pos1
         if "sphere" in shape_pocket:
             pass
@@ -762,14 +766,15 @@ def get_lid_array(thing, **kwargs):
         p3 = copy.deepcopy(kwargs)
         p3["type"] = "n"
         p3["shape"] = shape_pocket
-        p3["radius"] = 5 - clearance_inset * 2 - thickness_wall_inset * 2
-        p3["depth"] = depth * 2
-        w = (width_tray * 15) - clearance_wall - clearance_inset - thickness_wall_inset * 2
-        h = (height_tray * 15) - clearance_wall - clearance_inset - thickness_wall_inset * 2
-        d = depth * 2
+        r = 5 - (clearance_wall + clearance_inset * 2 + thickness_wall_inset * 2)/2
+        p3["radius"] = r
+        p3["depth"] = depth_pocket
+        w = (width_tray * 15) - clearance_wall - clearance_inset * 2 - thickness_wall_inset * 2
+        h = (height_tray * 15) - clearance_wall - clearance_inset * 2 - thickness_wall_inset * 2
+        d = depth_pocket
         p3["size"] = [w, h, d]
         pos1 = copy.deepcopy(pocket["position"])
-        pos1[2] += -depth - depth
+        pos1[2] += -depth_pocket
         p3["pos"] = pos1
         if "sphere" in shape_pocket:
             pass
