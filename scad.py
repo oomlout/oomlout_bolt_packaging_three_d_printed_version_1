@@ -716,6 +716,47 @@ def get_lid_array(thing, **kwargs):
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
 
+    global width_hinge, width_hinge_inside, clearance_design
+
+    #add outer lip cleaance for hing bottom
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_cube"
+
+    w = (width_hinge - width_hinge_inside)/2 + clearance_design
+    h = extra_lid_overhang
+    d = depth_lid_overhang
+    size = [w, h, d]
+    p3["size"] = size
+    if True:        
+        shift_hinge = kwargs.get("shift_hinge", None)
+        shift_shift = width_hinge/2
+        shift_outside = shift_hinge + shift_shift - w/2 + clearance_design
+        shift_inside = shift_hinge - shift_shift + w/2 - clearance_design
+        poss = []
+        pos1 = copy.deepcopy(pos)
+        pos1[2] += -depth_lid_overhang
+        pos1[1] += 0 - pos1[1] + extra_lid_overhang/2 
+        pos11 = copy.deepcopy(pos1)
+        
+        
+        pos11[0] += shift_outside 
+        pos12 = copy.deepcopy(pos1)
+        pos12[0] += shift_inside
+
+        pos13 = copy.deepcopy(pos1)
+        pos13[0] += -shift_outside
+        pos14 = copy.deepcopy(pos1)
+        pos14[0] += -shift_inside
+        poss.append(pos11)
+        poss.append(pos12)
+        poss.append(pos13)
+        poss.append(pos14)
+    p3["pos"] = poss
+    p3["m"] = "#"
+    oobb_base.append_full(thing,**p3)
+
+
     #add plate hinge_support 
     #no longer used
     # p3 = copy.deepcopy(kwargs)
