@@ -7,11 +7,11 @@ clearance_design = 1
 clearance_wall = 1/2
 clearance_bottom = 1
 
-width_hinge = 25
+width_hinge = 20
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
 
-extra_lid_overhang = 3
+extra_lid_overhang = 2
 depth_lid_overhang = 2
 thickness_lid_wall_exterior = 1.5
 
@@ -127,7 +127,7 @@ def make_scad(**kwargs):
             height_tray_tray_mm = height_tray_tray * 15
             p3["height_tray_tray_mm"] = height_tray_tray_mm  
             global clearance_wall
-            default_shift_hinge = width_tray_tray_mm / 2 - width_hinge/2 + clearance_wall/2 - 1/2 
+            default_shift_hinge = width_tray_tray_mm / 2 - width_hinge/2 + clearance_wall/2
             p3["shift_hinge"] = default_shift_hinge
 
             p3["extra"] = extra 
@@ -304,7 +304,7 @@ def get_latch_top(thing, **kwargs):
     p3["radius"] = 7 / 2
     p3["depth"] = 10
     p3["zz"] = "top"
-    p3["m"] = "#"
+    #p3["m"] = "#"
     pos1 = copy.deepcopy(pos)         
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
@@ -464,7 +464,7 @@ def get_hinge_bottom(thing, **kwargs):
     p3["rot"] = [0, 90, 0]
     if screw_rotation:
         p3["rot"] = [0, 270, 0]
-    p3["m"] = "#"
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
 
@@ -523,7 +523,7 @@ def get_hinge_top(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
-    w = (width) * 15
+    w = width_hinge_inside
     h = ((height-0.5)*15) + diameter_hinge_inside/2
     d = depth_lid
     size = [w, h, d]
@@ -740,7 +740,8 @@ def get_lid_array(thing, **kwargs):
 
     w = (width_hinge - width_hinge_inside)/2 + clearance_design
     h = extra_lid_overhang
-    d = depth_lid_overhang
+    d = 10 # extra clearance for hinge maybe
+    #d = depth_lid_overhang # just the lip
     size = [w, h, d]
     p3["size"] = size
     if True:        
@@ -768,7 +769,7 @@ def get_lid_array(thing, **kwargs):
         poss.append(pos13)
         poss.append(pos14)
     p3["pos"] = poss
-    p3["m"] = "#"
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
 
