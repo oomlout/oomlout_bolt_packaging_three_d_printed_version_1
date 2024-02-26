@@ -296,6 +296,19 @@ def get_latch_top(thing, **kwargs):
     p3["pos"] = pos1
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
+    
+    # add top clearance
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_cylinder"  
+    p3["radius"] = 7 / 2
+    p3["depth"] = 10
+    p3["zz"] = "top"
+    p3["m"] = "#"
+    pos1 = copy.deepcopy(pos)         
+    p3["pos"] = pos1
+    oobb_base.append_full(thing,**p3)
+
 
 
 def get_hinge(thing, **kwargs):  
@@ -615,6 +628,8 @@ def get_lid(thing, **kwargs):
         p4 = copy.deepcopy(p3)
         p4["pos"] = pos1
         get_latch_top(thing, **p4)
+
+    
 
 def get_lid_basic(thing, **kwargs):
     depth = kwargs.get("thickness", 4)
