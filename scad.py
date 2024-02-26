@@ -286,6 +286,21 @@ def get_latch_top(thing, **kwargs):
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
 
+    ### currently skipped because no easy way to clip can be donbe with a rotation object
+    # global depth_lid_overhang
+    # #add lip tube
+    # p3["type"] = "positive"
+    # p3["shape"] = f"oobb_cylinder_hollow"  
+    # p3["r"] = 10 / 2
+    # p3["depth"] = depth + depth_lid_overhang
+    # p3["zz"] = "bottom"
+    # p3["wall_thickness"] = depth_lid_overhang
+    # #p3["m"] = "#"
+    # pos1 = copy.deepcopy(pos)         
+    # pos1[2] += -depth - depth_lid_overhang/2
+    # p3["pos"] = pos1
+
+    oobb_base.append_full(thing,**p3)
     
     # add hole
     p3 = copy.deepcopy(kwargs)
@@ -710,7 +725,7 @@ def get_lid_array(thing, **kwargs):
     p3["height"] = height_full + extra_size
     p3["extra_mm"] = True
     #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos)         
+    pos1 = copy.deepcopy(pos)       
     p3["pos"] = pos1
     oobb_base.append_full(thing,**p3)
     
@@ -734,100 +749,109 @@ def get_lid_array(thing, **kwargs):
     global width_hinge, width_hinge_inside, clearance_design
 
     #add outer lip cleaance for hing bottom
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "n"
-    p3["shape"] = f"oobb_cube"
+    if True:
+        #outside clearance
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = f"oobb_cube"
 
-    w = (width_hinge - width_hinge_inside)/2 + clearance_design
-    h = extra_lid_overhang
-    d = 10 # extra clearance for hinge maybe
-    #d = depth_lid_overhang # just the lip
-    size = [w, h, d]
-    p3["size"] = size
-    if True:        
-        shift_hinge = kwargs.get("shift_hinge", None)
-        shift_shift = width_hinge/2
-        shift_outside = shift_hinge + shift_shift - w/2 + clearance_design
-        shift_inside = shift_hinge - shift_shift + w/2 - clearance_design
-        poss = []
-        pos1 = copy.deepcopy(pos)
-        pos1[2] += -depth_lid_overhang
-        pos1[1] += 0 - pos1[1] + extra_lid_overhang/2 
-        pos11 = copy.deepcopy(pos1)
+        w = (width_hinge - width_hinge_inside)/2 + clearance_design
+        h = extra_lid_overhang
+        d = 10 # extra clearance for hinge maybe
+        #d = depth_lid_overhang # just the lip
+        size = [w, h, d]
+        p3["size"] = size
+        if True:        
+            #clearance for the hinge bottom piece
+            shift_hinge = kwargs.get("shift_hinge", None)
+            shift_shift = width_hinge/2
+            shift_outside = shift_hinge + shift_shift - w/2 + clearance_design
+            shift_inside = shift_hinge - shift_shift + w/2 - clearance_design
+            poss = []
+            pos1 = copy.deepcopy(pos)
+            pos1[2] += -depth_lid_overhang
+            pos1[1] += 0 - pos1[1] + extra_lid_overhang/2 
+            pos11 = copy.deepcopy(pos1)
+            
+            
+            pos11[0] += shift_outside 
+            pos12 = copy.deepcopy(pos1)
+            pos12[0] += shift_inside
+
+            pos13 = copy.deepcopy(pos1)
+            pos13[0] += -shift_outside
+            pos14 = copy.deepcopy(pos1)
+            pos14[0] += -shift_inside
+            poss.append(pos11)
+            poss.append(pos12)
+            poss.append(pos13)
+            poss.append(pos14)
+        p3["pos"] = poss
+        #p3["m"] = "#"
+        oobb_base.append_full(thing,**p3)
+
+    #clearanmce for the corners
+    if True:
+        #outside clearance two cubes
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = f"oobb_cube"
+
+        w = 10
+        h = 5
+        d = depth_lid_overhang
+        #d = depth_lid_overhang # just the lip
+        size = [w, h, d]
+        p3["size"] = size
+        if True:        
+            #clearance for the hinge bottom piece
+            shift_hinge = kwargs.get("shift_hinge", None)
+            shift_shift = width_hinge_inside/2 + w /2
+            shift_outside = shift_hinge + shift_shift
+            poss = []
+            pos1 = copy.deepcopy(pos)
+            pos1[2] += -depth_lid_overhang
+            pos1[1] += 0 - pos1[1] + extra_lid_overhang/2 
+            pos11 = copy.deepcopy(pos1)
+            pos11[0] += shift_outside 
+            pos13 = copy.deepcopy(pos1)
+            pos13[0] += -shift_outside
+            poss.append(pos11)
+            poss.append(pos13)
+        p3["pos"] = poss
+        #p3["m"] = "#"
+        oobb_base.append_full(thing,**p3)
         
-        
-        pos11[0] += shift_outside 
-        pos12 = copy.deepcopy(pos1)
-        pos12[0] += shift_inside
+        # second outside clearance cube
+        #outside clearance two cubes
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = f"oobb_cube"
 
-        pos13 = copy.deepcopy(pos1)
-        pos13[0] += -shift_outside
-        pos14 = copy.deepcopy(pos1)
-        pos14[0] += -shift_inside
-        poss.append(pos11)
-        poss.append(pos12)
-        poss.append(pos13)
-        poss.append(pos14)
-    p3["pos"] = poss
-    #p3["m"] = "#"
-    oobb_base.append_full(thing,**p3)
-
-
-    #add plate hinge_support 
-    #no longer used
-    # p3 = copy.deepcopy(kwargs)
-    # p3["type"] = "p"
-    # p3["shape"] = f"oobb_plate"    
-    # p3["depth"] = depth_hinge_support
-    # p3["width"] = 1 + extra_size
-    # p3["height"] = height_tray_tray + 1 + extra_size
-    # p3["extra_mm"] = True
-    # poss = []
-    # pos1 = copy.deepcopy(pos)    
-    # pos1[1] += 15/2
-    # pos11 = copy.deepcopy(pos1)
-    # pos11[0] += width_tray_tray * 15 / 2 - 15/2
-    # pos12 = copy.deepcopy(pos1)
-    # pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
-    # poss.append(pos11)
-    # poss.append(pos12)
-    # p3["pos"] = poss
-    # oobb_base.append_full(thing,**p3)
-    
-
-
-    #add holes
-    #no lnoger used
-    # p3 = copy.deepcopy(kwargs)
-    # p3["type"] = "n"
-    # p3["shape"] = f"oobb_hole"
-    # p3["radius_name"] = "m6"         
-    # p3["width"] = width_tray_tray
-    # p3["height"] = height_tray_tray    
-    # poss = []
-    # pos1 = copy.deepcopy(pos)
-    # pos1[1] += height_tray_tray* 15/2 + 15/2
-    # pos11 = copy.deepcopy(pos1)
-    # pos11[0] += width_tray_tray * 15 / 2 - 15/2
-    # pos12 = copy.deepcopy(pos1)
-    # pos12[0] += -(width_tray_tray * 15 / 2 - 15/2)
-    # poss.append(pos11)
-    # poss.append(pos12)
-    # p3["pos"] = poss
-    # #p3["m"] = "#"
-    # oobb_base.append_full(thing,**p3)
-    
-    #add m6 nuts
-    #no longer used
-    # p3 = copy.deepcopy(kwargs)
-    # p3["type"] = "n"
-    # p3["shape"] = f"oobb_nut"
-    # p3["radius_name"] = "m6"
-    # p3["pos"] = poss
-    # p3["overhang"] = True
-    # #p3["m"] = "#"
-    # oobb_base.append_full(thing,**p3)
-    
+        w = 5
+        h = 4
+        d = depth_lid_overhang
+        #d = depth_lid_overhang # just the lip
+        size = [w, h, d]
+        p3["size"] = size
+        if True:        
+            #clearance for the hinge bottom piece
+            shift_hinge = kwargs.get("shift_hinge", None)
+            shift_shift = width_hinge_inside/2 + w * 3/2
+            shift_outside = shift_hinge + shift_shift
+            poss = []
+            pos1 = copy.deepcopy(pos)
+            pos1[2] += -depth_lid_overhang
+            pos1[1] += 0 - pos1[1] + extra_lid_overhang/2 + - h/2
+            pos11 = copy.deepcopy(pos1)
+            pos11[0] += shift_outside 
+            pos13 = copy.deepcopy(pos1)
+            pos13[0] += -shift_outside
+            poss.append(pos11)
+            poss.append(pos13)
+        p3["pos"] = poss
+        #p3["m"] = "#"
+        oobb_base.append_full(thing,**p3)
 
     
     

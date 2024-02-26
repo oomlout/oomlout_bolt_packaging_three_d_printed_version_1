@@ -8,6 +8,9 @@ difference() {
 		translate(v = [30, 0, 0.0000000000]) {
 			cylinder(h = 15, r = 5.0000000000);
 		}
+		translate(v = [30, 0, 0.0000000000]) {
+			cylinder(h = 15, r = 5.0000000000);
+		}
 	}
 	union() {
 		translate(v = [0, 0, 0]) {
