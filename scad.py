@@ -11,8 +11,8 @@ width_hinge = 20
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
 
-extra_lid_overhang = 2
-depth_lid_overhang = 2
+extra_lid_overhang = 3
+depth_lid_overhang = 3
 thickness_lid_wall_exterior = 1.5
 
 def main(**kwargs):
@@ -72,9 +72,10 @@ def make_scad(**kwargs):
             sizes.append({"width": 5, "height": 2}) 
             sizes.append({"width": 4, "height": 2})         
             sizes.append({"width": 3, "height": 2})
-            sizes.append({"width": 2, "height": 1}) 
+            sizes.append({"width": 4, "height": 3})
+        sizes.append({"width": 2, "height": 1}) 
 
-        sizes.append({"width": 4, "height": 3})
+        
         
 
 
