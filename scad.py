@@ -21,8 +21,8 @@ def main(**kwargs):
 def make_scad(**kwargs):
     parts = []
 
-    #run_fast = True
-    run_fast = False
+    run_fast = True
+    #run_fast = False
 
     # save_type variables
     if True:
@@ -70,9 +70,11 @@ def make_scad(**kwargs):
                 
         if not run_fast:
             sizes.append({"width": 5, "height": 2}) 
-            sizes.append({"width": 4, "height": 2}) 
+            sizes.append({"width": 4, "height": 2})         
             sizes.append({"width": 3, "height": 2})
-        sizes.append({"width": 2, "height": 1}) 
+            sizes.append({"width": 2, "height": 1}) 
+
+        sizes.append({"width": 4, "height": 3})
         
 
 
