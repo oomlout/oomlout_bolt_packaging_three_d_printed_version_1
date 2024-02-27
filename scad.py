@@ -11,7 +11,7 @@ width_hinge = 20
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
 
-extra_lid_overhang = 3
+extra_lid_overhang = 2.5
 depth_lid_overhang = 3
 thickness_lid_wall_exterior = 1.5
 
@@ -32,8 +32,8 @@ def make_scad(**kwargs):
         #filter = "lid"
         #filter = "latch"
 
-        #kwargs["save_type"] = "none"
-        kwargs["save_type"] = "all"
+        kwargs["save_type"] = "none"
+        #kwargs["save_type"] = "all"
         
         kwargs["overwrite"] = True
         
