@@ -73,11 +73,11 @@ def make_scad(**kwargs):
                 
         if not run_fast:
             sizes.append({"width": 5, "height": 2}) 
-            sizes.append({"width": 4, "height": 2})         
-            sizes.append({"width": 3, "height": 2})            
+            sizes.append({"width": 4, "height": 2})
             sizes.append({"width": 2, "height": 1})
+            sizes.append({"width": 4, "height": 3})
 
-        sizes.append({"width": 4, "height": 3}) 
+        sizes.append({"width": 3, "height": 2})             
 
         
         
