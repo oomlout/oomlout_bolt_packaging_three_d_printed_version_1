@@ -401,15 +401,17 @@ def get_hinge_bottom(thing, **kwargs):
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
     w = width_hinge
-    h = height*15 - 7.5
+    h = height*15 - 7.5    
     d = depth
+    if clearance_hinge_bottom:
+        d += -depth_lid_overhang - clearance_design
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
     pos1[1] += -7.5 /2   
     pos1[2] += (15 - depth)  /2    
     p3["pos"] = pos1
-    #p3["m"] = "#"
+    p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
     #add connecting cube bottom
@@ -470,7 +472,8 @@ def get_hinge_bottom(thing, **kwargs):
     oobb_base.append_full(thing,**p3)
 
     #add lid clearance
-    if clearance_hinge_bottom:
+    clearance_hinge_bottom_old_style_cutout = False
+    if clearance_hinge_bottom_old_style_cutout:
         #angled piece
         p3 = copy.deepcopy(kwargs)
         p3["type"] = "n"
