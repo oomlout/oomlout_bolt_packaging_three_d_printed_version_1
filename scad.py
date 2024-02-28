@@ -733,6 +733,7 @@ def get_lid_array_hole_in_hinge_bottom_for_lip_clearance(thing, **kwargs):
     p3["depth"] = depth
     p3["width"] = width_full + extra_size
     p3["height"] = height_full + extra_size
+    p3["radius"] = 5 + extra_size
     p3["extra_mm"] = True
     #p3["m"] = "#"
     pos1 = copy.deepcopy(pos)       
