@@ -10,7 +10,7 @@ clearance_bottom = 1
 width_hinge = 20
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
-diameter_hinge_bottom = 15
+diameter_hinge_bottom = 12
 
 extra_lid_overhang = 2.5
 depth_lid_overhang = 3
@@ -467,23 +467,23 @@ def get_hinge_bottom(thing, **kwargs):
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
-    #add lid clearacne
+    #add lid clearance
     if clearance_hinge_bottom:
         p3 = copy.deepcopy(kwargs)
         p3["type"] = "n"
         p3["shape"] = f"oobb_cube"
         w = width_hinge
-        h = extra_lid_overhang + clearance_design
-        d = depth_lid_overhang + clearance_design
+        h = 12 #extra_lid_overhang + clearance_design
+        d = 6 # depth_lid_overhang + clearance_design
         size = [w, h, d]
         p3["size"] = size
         pos1 = copy.deepcopy(pos)
-        pos1[1] += -15/2 + extra_lid_overhang/2
-        pos1[2] += 15/2
+        pos1[1] += -2#-15/2 + extra_lid_overhang/2
+        pos1[2] += 8.5#15/2
         p3["zz"] = "top"
-
+        p3["rot"] = [22.5, 0, 0]
         p3["pos"] = pos1
-        #p3["m"] = "#"
+        p3["m"] = "#"
         oobb_base.append_full(thing,**p3)
 
 def get_hinge_top(thing, **kwargs):
