@@ -11,6 +11,7 @@ width_hinge = 20
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
 diameter_hinge_bottom = 12
+diameter_latch_bottom = 15
 
 thickness_lid_wall_exterior = 1.5
 gap_between_lid_and_wall = 0.75
@@ -218,7 +219,7 @@ def get_latch_bottom(thing, **kwargs):
     height = kwargs.get("height", 10)
     pos = kwargs.get("pos", [0, 0, 0])
     pos_plate = copy.deepcopy(pos)
-    pos_plate[1] += -height * 15 / 4
+    pos_plate[1] += 0
     pos_plate[2] += -depth /2
     prepare_print = kwargs.get("prepare_print", False)
     radius_screw = kwargs.get("radius_screw", "m6")
@@ -233,8 +234,8 @@ def get_latch_bottom(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cylinder"
-    global diameter_hinge_bottom
-    p3["radius"] = diameter_hinge_bottom / 2
+    global diameter_latch_bottom
+    p3["radius"] = diameter_latch_bottom / 2
     global width_hinge
     d = width_hinge
     p3["depth"] = d
@@ -244,6 +245,22 @@ def get_latch_bottom(thing, **kwargs):
     pos1 = copy.deepcopy(pos)         
     pos1[0] += -d/2
     p3["pos"] = pos1
+    #oobb_base.append_full(thing,**p3)
+
+    #add connecting cube top
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "p"
+    p3["shape"] = f"rounded_rectangle"
+    w = width_hinge
+    h = height*15 
+    d = depth    
+    size = [w, h, d]
+    p3["size"] = size
+    pos1 = copy.deepcopy(pos_plate)
+    pos1[1] += 0  
+    pos1[2] += (15 - depth)  /2    
+    p3["pos"] = pos1
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
     #add connecting cube top
@@ -251,14 +268,12 @@ def get_latch_bottom(thing, **kwargs):
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
     w = width_hinge
-    h = height*15 - 7.5    
-    d = depth
-    if clearance_hinge_bottom:
-        d += -depth_lid_overhang - clearance_design
+    h = 5 
+    d = depth    
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
-    pos1[1] += 15/2  
+    pos1[1] += 7.5  - h / 2
     pos1[2] += (15 - depth)  /2    
     p3["pos"] = pos1
     #p3["m"] = "#"
@@ -278,7 +293,7 @@ def get_latch_bottom(thing, **kwargs):
     pos1[2] += (15 - depth)  /2
     p3["pos"] = pos1
     #p3["m"] = "#"
-    oobb_base.append_full(thing,**p3)
+    #oobb_base.append_full(thing,**p3)
 
     
     extra_rear = 3
@@ -298,7 +313,7 @@ def get_latch_bottom(thing, **kwargs):
     pos1[1] += -extra_rear/2
     pos1[2] += (15 - depth)  /2
     p3["pos"] = pos1
-    p3["m"] = "#"
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
     
