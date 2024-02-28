@@ -13,7 +13,7 @@ diameter_hinge_inside = 14
 diameter_hinge_bottom = 12
 
 thickness_lid_wall_exterior = 1.5
-gap_between_lid_and_wall = 0.5
+gap_between_lid_and_wall = 0.75
 extra_lid_overhang = thickness_lid_wall_exterior + gap_between_lid_and_wall
 depth_lid_overhang = 3
 
@@ -75,18 +75,20 @@ def make_scad(**kwargs):
             sizes.append({"width": 5, "height": 2}) 
             sizes.append({"width": 4, "height": 2})
             sizes.append({"width": 2, "height": 1})
+            sizes.append({"width": 3, "height": 2})             
             sizes.append({"width": 4, "height": 3})
-
-        sizes.append({"width": 3, "height": 2})             
+        sizes.append({"width": 2, "height": 1})             
+        
 
         
         
 
 
         trays = []
+        #trays.append({"width": 3, "height": 2})
         trays.append({"width": 2, "height": 2})
         if not run_fast:
-            trays.append({"width": 3, "height": 2})
+            trays.append({"width": 3, "height": 2})   
             trays.append({"width": 3, "height": 3})
         thicknesses = [15]
         if not run_fast:
