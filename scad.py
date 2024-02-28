@@ -286,18 +286,51 @@ def get_latch_top(thing, **kwargs):
     # variable
     clearance_design = kwargs.get("clearance_design", 0.5)
     
-
+    style_cylinder = False
     #add main cylinder
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "p"
-    p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 10 / 2
-    p3["depth"] = depth
-    p3["zz"] = "bottom"
-    #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos)         
-    p3["pos"] = pos1
-    oobb_base.append_full(thing,**p3)
+    if style_cylinder:
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "p"
+        p3["shape"] = f"oobb_cylinder"  
+        p3["radius"] = 10 / 2
+        p3["depth"] = depth
+        p3["zz"] = "bottom"
+        #p3["m"] = "#"
+        pos1 = copy.deepcopy(pos)         
+        p3["pos"] = pos1
+        oobb_base.append_full(thing,**p3)
+    else:
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "p"
+        p3["shape"] = f"rounded_rectangle"  
+        w = 15
+        h = 3
+        d = depth
+        size = [w, h, d]
+        p3["size"] = size
+        p3["zz"] = "bottom"
+        p3["radius"] = 2
+        #p3["m"] = "#"
+        pos1 = copy.deepcopy(pos) 
+        pos1[1] += -extra_lid_overhang/2  - h/2 -.5     
+        p3["pos"] = pos1
+        oobb_base.append_full(thing,**p3)
+
+        #add lip
+        p4 = copy.deepcopy(p3)
+        p4["type"] = "p"
+        p4["shape"] = f"oobb_rounded_rectangle_hollow"
+        d = depth + depth_lid_overhang
+        size = [w, h, d]
+        p4["size"] = size
+        p4["wall_thickness"] = thickness_lid_wall_exterior
+        p4["zz"] = "bottom"
+        pos1 = copy.deepcopy(p4["pos"])
+        pos1[2] += -depth_lid_overhang
+        p4["pos"] = pos1
+        #p4["m"] = "#"
+        oobb_base.append_full(thing,**p4)
+
 
     ### currently skipped because no easy way to clip can be donbe with a rotation object
     # global depth_lid_overhang
@@ -326,16 +359,33 @@ def get_latch_top(thing, **kwargs):
     oobb_base.append_full(thing,**p3)
     
     # add top clearance
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "n"
-    p3["shape"] = f"oobb_cylinder"  
-    p3["radius"] = 7 / 2
-    p3["depth"] = 10
-    p3["zz"] = "top"
-    #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos)         
-    p3["pos"] = pos1
-    oobb_base.append_full(thing,**p3)
+    
+    if style_cylinder:
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = f"oobb_cylinder"  
+        p3["radius"] = 7 / 2
+        p3["depth"] = 10
+        p3["zz"] = "top"
+        #p3["m"] = "#"
+        pos1 = copy.deepcopy(pos)         
+        p3["pos"] = pos1
+        oobb_base.append_full(thing,**p3)
+    else:
+        p3 = copy.deepcopy(kwargs)
+        p3["type"] = "n"
+        p3["shape"] = f"oobb_cube"  
+        w = 12
+        h = 3
+        d = 10
+        size = [w, h, d]
+        p3["size"] = size
+        p3["zz"] = "top"
+        #p3["m"] = "#"
+        pos1 = copy.deepcopy(pos) 
+        pos1[1] += -h/2        
+        p3["pos"] = pos1
+        oobb_base.append_full(thing,**p3)
 
 
 
@@ -411,7 +461,7 @@ def get_hinge_bottom(thing, **kwargs):
     pos1[1] += -7.5 /2   
     pos1[2] += (15 - depth)  /2    
     p3["pos"] = pos1
-    p3["m"] = "#"
+    #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
     #add connecting cube bottom
@@ -764,6 +814,7 @@ def get_lid_array_hole_in_hinge_bottom_for_lip_clearance(thing, **kwargs):
     oobb_base.append_full(thing,**p3)
     
     #add outer lip
+    p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_rounded_rectangle_hollow"    
 
@@ -778,6 +829,7 @@ def get_lid_array_hole_in_hinge_bottom_for_lip_clearance(thing, **kwargs):
     pos1 = copy.deepcopy(pos)  
     pos1[2] += -depth_lid_overhang       
     p3["pos"] = pos1
+    p3["radius"] = 5 + extra_size
     oobb_base.append_full(thing,**p3)
 
     global width_hinge, width_hinge_inside, clearance_design
