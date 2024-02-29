@@ -37,8 +37,8 @@ def make_scad(**kwargs):
         #filter = "lid"
         #filter = "latch"
 
-        kwargs["save_type"] = "none"
-        #kwargs["save_type"] = "all"
+        #kwargs["save_type"] = "none"
+        kwargs["save_type"] = "all"
         
         kwargs["overwrite"] = True
         
@@ -79,7 +79,9 @@ def make_scad(**kwargs):
             sizes.append({"width": 2, "height": 1})
             sizes.append({"width": 3, "height": 2})             
             sizes.append({"width": 4, "height": 3})
-        sizes.append({"width": 2, "height": 1})             
+        
+        #sizes.append({"width": 2, "height": 1})             
+        sizes.append({"width": 3, "height": 3})             
         
 
         
@@ -87,12 +89,14 @@ def make_scad(**kwargs):
 
 
         trays = []
-        #trays.append({"width": 3, "height": 2})
-        trays.append({"width": 2, "height": 2})
+        trays.append({"width": 3, "height": 3})
+        #trays.append({"width": 2, "height": 2})
+        
         if not run_fast:
             trays.append({"width": 3, "height": 2})   
             trays.append({"width": 3, "height": 3})
-        thicknesses = [15]
+        #thicknesses = [15]
+        thicknesses = [20]
         if not run_fast:
             thicknesses.append(20)
         
@@ -202,14 +206,14 @@ def get_latch(thing, **kwargs):
     pos = kwargs.get("pos", [0, 0, 0])
     p3 = copy.deepcopy(kwargs)
     pos1 = copy.deepcopy(pos)
-    #pos1[0] += 30
+    #pos1[0] += 45
     p3["pos"] = pos1
     get_latch_bottom(thing, **p3)
     
     
     p3 = copy.deepcopy(kwargs)
     pos1 = copy.deepcopy(pos)
-    pos1[0] += 30
+    pos1[0] += 45
     p3["pos"] = pos1
     get_latch_top(thing, **p3)
 
@@ -241,7 +245,8 @@ def get_latch_bottom(thing, **kwargs):
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
-    pos1[1] += 0  
+    shift_latch = 5
+    pos1[0] += shift_latch
     pos1[2] += (15 - depth)  /2    
     p3["pos"] = pos1
     #p3["m"] = "#"
@@ -251,12 +256,13 @@ def get_latch_bottom(thing, **kwargs):
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
-    w = width_hinge
+    w = width_latch
     h = 5 
     d = depth - depth_lid_overhang    
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
+    pos1[0] += shift_latch
     pos1[1] += 7.5  - h / 2
     pos1[2] += (15 - depth)  /2    
     p3["pos"] = pos1
@@ -300,6 +306,9 @@ def get_latch_bottom(thing, **kwargs):
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
+
+    
+    
     
 
     #add screw
@@ -308,12 +317,10 @@ def get_latch_bottom(thing, **kwargs):
     p3["shape"] = f"oobb_screw_socket_cap"
     p3["radius_name"] = radius_screw
     pos2 = copy.deepcopy(pos)
-    pos2[0] += width_hinge / 2
-    if screw_rotation:
-        pos2[0] += -width_hinge
+    pos2[0] += width_latch / 2 + shift_latch
     p3["pos"] = pos2    
-    p3["nut"] = True
-    p3["depth"] = width_hinge
+    p3["nut"] = False
+    p3["depth"] = width_latch
     if radius_screw == "m6":
         p3["depth"] += 2
     p3["rot"] = [0, 90, 0]
@@ -321,43 +328,35 @@ def get_latch_bottom(thing, **kwargs):
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
-    #add lid clearance
-    clearance_hinge_bottom_old_style_cutout = False
-    if clearance_hinge_bottom_old_style_cutout:
-        #angled piece
-        p3 = copy.deepcopy(kwargs)
-        p3["type"] = "n"
-        p3["shape"] = f"oobb_cube"
-        w = width_hinge
-        h = 12 #extra_lid_overhang + clearance_design
-        d = 6 # depth_lid_overhang + clearance_design
-        size = [w, h, d]
-        p3["size"] = size
-        pos1 = copy.deepcopy(pos)
-        pos1[1] += -0#-15/2 + extra_lid_overhang/2
-        pos1[2] += 4.5#15/2
-        p3["zz"] = "bottom"
-        p3["rot"] = [22.5, 0, 0]
-        p3["pos"] = pos1
-        p3["m"] = "#"
-        oobb_base.append_full(thing,**p3)
-        # flat piece
-        p3 = copy.deepcopy(kwargs)
-        p3["type"] = "n"
-        p3["shape"] = f"oobb_cube"
-        w = width_hinge
-        h = 3 #extra_lid_overhang + clearance_design
-        d = 6 # depth_lid_overhang + clearance_design
-        size = [w, h, d]
-        p3["size"] = size
-        pos1 = copy.deepcopy(pos)
-        pos1[1] += -5.75#-15/2 + extra_lid_overhang/2
-        pos1[2] += 7.5#15/2
-        p3["zz"] = "middle"
-        #p3["rot"] = [22.5, 0, 0]
-        p3["pos"] = pos1
-        p3["m"] = "#"
-        oobb_base.append_full(thing,**p3)
+    #add nut
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_nut"
+    p3["radius_name"] = radius_screw
+    pos2 = copy.deepcopy(pos)
+    pos2[0] += width_latch / 2 + shift_latch - 9
+    p3["pos"] = pos2    
+    p3["rot"] = [0, 90, 0]    
+    p3["m"] = "#"
+    #oobb_base.append_full(thing,**p3)
+
+    #add cutout nut
+    p3 = copy.deepcopy(kwargs)
+    p3["type"] = "n"
+    p3["shape"] = f"oobb_cube"    
+    w = 6    
+    h = 12 + extra_rear
+    d = 10
+    p3["zz"] = "middle"
+    size = [w, h, d]
+    p3["size"] = size 
+    pos1 = copy.deepcopy(pos2)
+    pos1[0] += w/2
+    pos1[1] += -1 - extra_rear/2
+    pos1[2] += 0
+    p3["pos"] = pos1
+    #p3["m"] = "#"
+    oobb_base.append_full(thing,**p3)
     
 
 def get_latch_bottom_old_1(thing, **kwargs):
@@ -678,6 +677,7 @@ def get_hinge_bottom(thing, **kwargs):
     if screw_rotation:
         p3["rot"] = [0, 270, 0]
     #p3["m"] = "#"
+    p3["overhang"] = False
     oobb_base.append_full(thing,**p3)
 
     #add lid clearance
@@ -864,17 +864,18 @@ def get_lid(thing, **kwargs):
     pos1 = copy.deepcopy(pos)
     pos1[1] += -height_tray_tray_mm
     poss = []
-    if width % 2 != 0:
-        pos1 = copy.deepcopy(pos)        
-        pos1[1] += -height_tray_tray_mm + 7.5
-        pos1[2] += -15/2
-        pos11 = copy.deepcopy(pos1)
-        pos11[0] += width_tray * 15 / 2
-        pos12 = copy.deepcopy(pos1)
-        pos12[0] += -width_tray * 15 / 2
-        poss.append(pos11)
-        poss.append(pos12)
-    else:
+    # #if width % 2 != 0:
+    # #    pos1 = copy.deepcopy(pos)        
+    # #    pos1[1] += -height_tray_tray_mm - 7.5
+    #     pos1[2] += -15/2
+    #     pos11 = copy.deepcopy(pos1)
+    #     pos11[0] += width_tray * 15 / 2
+    #     pos12 = copy.deepcopy(pos1)
+    #     pos12[0] += -width_tray * 15 / 2
+    #     poss.append(pos11)
+    #     poss.append(pos12)
+    # else:
+    if True:
         pos1 = copy.deepcopy(pos)
         pos1[1] += -height_tray_tray_mm - 7.5
         pos1[2] += -15/2
@@ -1496,19 +1497,20 @@ def get_main_body(thing, **kwargs):
     p3["width"] = 1
     p3["height"] = 1
     poss = []
-    if width % 2 != 0:
-        pos1 = copy.deepcopy(pos)
-        pos1[1] += -height_tray_tray_mm
-        pos11 = copy.deepcopy(pos1)
-        pos11[0] += width_tray * 15 / 2
-        pos12 = copy.deepcopy(pos1)
-        pos12[0] += -width_tray * 15 / 2
-        poss.append(pos11)
-        poss.append(pos12)
-    else:
+    # if width % 2 != 0:
+    #     pos1 = copy.deepcopy(pos)
+    #     pos1[1] += -height_tray_tray_mm
+    #     pos11 = copy.deepcopy(pos1)
+    #     pos11[0] += width_tray * 15 / 2
+    #     pos12 = copy.deepcopy(pos1)
+    #     pos12[0] += -width_tray * 15 / 2
+    #     poss.append(pos11)
+    #     poss.append(pos12)
+    # else:
+    if True:
         pos1 = copy.deepcopy(pos)
         pos1[1] += -height_tray_tray_mm - 7.5
-        pos1[2] += 15/2
+        pos1[2] += 15/2 + depth - 15
         poss.append(pos1)
     for pos1 in poss:
         p4 = copy.deepcopy(p3)
