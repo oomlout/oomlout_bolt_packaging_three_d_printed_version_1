@@ -253,7 +253,7 @@ def get_latch_bottom(thing, **kwargs):
     p3["shape"] = f"rounded_rectangle"
     w = width_hinge
     h = height*15 
-    d = depth    
+    d = depth - depth_lid_overhang   
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
@@ -269,7 +269,7 @@ def get_latch_bottom(thing, **kwargs):
     p3["shape"] = f"oobb_cube"
     w = width_hinge
     h = 5 
-    d = depth    
+    d = depth - depth_lid_overhang    
     size = [w, h, d]
     p3["size"] = size
     pos1 = copy.deepcopy(pos_plate)
@@ -321,7 +321,7 @@ def get_latch_bottom(thing, **kwargs):
     #add screw
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "n"
-    p3["shape"] = f"oobb_screw_countersunk"
+    p3["shape"] = f"oobb_screw_socket_cap"
     p3["radius_name"] = radius_screw
     pos2 = copy.deepcopy(pos)
     pos2[0] += width_hinge / 2
@@ -333,8 +333,7 @@ def get_latch_bottom(thing, **kwargs):
     if radius_screw == "m6":
         p3["depth"] += 2
     p3["rot"] = [0, 90, 0]
-    if screw_rotation:
-        p3["rot"] = [0, 270, 0]
+    p3["rotation_nut"] = [0,0,360/12]
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
