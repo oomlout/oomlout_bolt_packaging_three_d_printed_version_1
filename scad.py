@@ -8,6 +8,7 @@ clearance_wall = 1/2
 clearance_bottom = 1
 
 width_hinge = 20
+width_latch = 30
 width_hinge_inside = width_hinge - 10
 diameter_hinge_inside = 14
 diameter_hinge_bottom = 12
@@ -36,8 +37,8 @@ def make_scad(**kwargs):
         #filter = "lid"
         #filter = "latch"
 
-        #kwargs["save_type"] = "none"
-        kwargs["save_type"] = "all"
+        kwargs["save_type"] = "none"
+        #kwargs["save_type"] = "all"
         
         kwargs["overwrite"] = True
         
@@ -230,28 +231,11 @@ def get_latch_bottom(thing, **kwargs):
     clearance_hinge_bottom = kwargs.get("clearance_hinge_bottom", True)
     
     
-    #add main cylinder
-    p3 = copy.deepcopy(kwargs)
-    p3["type"] = "p"
-    p3["shape"] = f"oobb_cylinder"
-    global diameter_latch_bottom
-    p3["radius"] = diameter_latch_bottom / 2
-    global width_hinge
-    d = width_hinge
-    p3["depth"] = d
-    p3["rot"] = [0, 90, 0]
-    p3["zz"] = "bottom"
-    #p3["m"] = "#"
-    pos1 = copy.deepcopy(pos)         
-    pos1[0] += -d/2
-    p3["pos"] = pos1
-    #oobb_base.append_full(thing,**p3)
-
-    #add connecting cube top
+    #add connecting cube rounded
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"rounded_rectangle"
-    w = width_hinge
+    w = width_latch
     h = height*15 
     d = depth - depth_lid_overhang   
     size = [w, h, d]
@@ -263,7 +247,7 @@ def get_latch_bottom(thing, **kwargs):
     #p3["m"] = "#"
     oobb_base.append_full(thing,**p3)
 
-    #add connecting cube top
+    #add connecting cube square bit
     p3 = copy.deepcopy(kwargs)
     p3["type"] = "p"
     p3["shape"] = f"oobb_cube"
