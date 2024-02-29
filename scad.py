@@ -1470,7 +1470,7 @@ def get_main_body(thing, **kwargs):
     shift_hinge = kwargs.get("shift_hinge", None)
 
     p3 = copy.deepcopy(kwargs)    
-    p3["thickness"] = 15
+    p3["thickness"] = depth
     p3["width"] = 1
     p3["height"] = 2
     poss = []
