@@ -26,8 +26,8 @@ def main(**kwargs):
 def make_scad(**kwargs):
     parts = []
 
-    run_fast = True
-    #run_fast = False
+    #run_fast = True
+    run_fast = False
 
     # save_type variables
     if True:
